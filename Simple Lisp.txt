@@ -1,0 +1,81 @@
+(defun linearp(l) ; declare a function called linearp
+                  ; checks if the input list is a linear list
+                  ; returns T and NIL
+               
+       (cond ( (null l) t) ; print t if the input is an empty list
+              
+             ( (atom l) t) ; print t if the input is an atom
+             
+             ( (listp(first l)) nil)  ; print nil if first of the input is a list
+                                      ; (sub list of the entered list) 
+                    
+             ( t ( linearp(rest l))) ; finally call the function on the rest of the input
+       )
+)
+
+
+(defun test-linearp ()
+       (print (linearp NIL))
+       (print (linearp 'A))
+       (print (linearp '(A B C D)))
+       (print (linearp '(A B (B C) D)))
+       (print (linearp '((A B) C D)))
+       (print (linearp '(((A)))))
+       (print (linearp '(A (B) ((C)) (((D))))))
+t)
+
+
+(defun mirror (l) ; declare a function called mirror
+                  ; returns the mirror image of the list
+
+       ( cond ( (null l) nil) ; returns nil if the input is an empty list or nil
+
+              ( (atom l) l)   ; returns the atom if the input is an atom
+
+              ( t ( append (mirror (rest l)) (list(mirror (first l))))) ; call the mirror function on the rest of the list
+                                                                         ; append this list to the list containing the mirror of the fist of list
+                                                                         ; this implies that the sublist in the list is also reversed along with the elements
+       )
+)
+
+(defun test-mirror ()
+       (print (mirror 'A))
+       (print (mirror '(A)))
+       (print (mirror '(D C B A)))
+       (print (mirror '((((D C B A))))))
+       (print (mirror '((D C) (B A))))
+       (print (mirror '(((E D) C) (B A))))
+       (print (mirror '(D (C) ((B)) (((A))))))
+       (print (mirror '(((((G F) E) D) C) ((B (A))))))
+t)
+
+
+
+(defun replacep(s1 s2 s3)  ; declare a function called replacep          
+                           ; replace expression s2 with s3 whenever s2 occurs in s1
+                           ; returns the modified list 
+                           ; could not name it replace as a built in function named replace already exists.     
+
+       (cond ( (null s1) nil) ; retuen nil if the expression S1 is an empty list 
+                                                 
+             ( (atom s1) nil) ; return nil if the expression S2 is an atom  
+                      
+             ( (equal (first s1) s2) (cons s3 (replacep (rest s1) s2 s3)))  ; this statement checks if first of s1 is equal to s2
+                                                                            ; returns a list with s3 in the first place and the rest of the list in s1                    
+            
+             ( t (cons (first s1) (replacep (rest s1) s2 s3)))  ; else return the list with first of s1 
+                                                                ; call the function replacep on the rest of s1 and s2 and s3.
+       )
+
+)
+
+(defun test-replacep()
+       (print(replacep '() '() 'B))
+       (print(replacep '(a b c) 'b 'd))
+       (print(replacep '(a (b c) d) '(b c) 'e)) 
+       (print(replacep '(a (b c) d) '(b c) '(e f))) 
+       (print(replacep '((a)) '(a) '(((a)))))
+       (print(replacep '(a (((b c))) d) '(b c) 'e))
+       (print(replacep '((a) (b) (c)) '(b) 'e)) 
+       (print(replacep '(a b c) ' d 'c))                                                                                                                       
+t)

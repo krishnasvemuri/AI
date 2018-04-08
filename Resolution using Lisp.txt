@@ -1,0 +1,152 @@
+;Krishna Sindhuri Vemuri
+;G01024066
+;CS 580 Assignment 6
+
+(defun resolution (lc)
+
+;This function is tha main function
+;of the resolution theorem prover
+
+       (let ((final '()))
+
+;this variable is used to check for contradiction 
+
+       (setf final (pl-resolution lc lc))
+
+;the function pl-resolution is called and the result is stored in this variable
+
+       (cond((null final) (print "There is no contradiction in the given set of clause") 'T)
+
+;if the pl-resolution function is empty no resolvents are present hence no contradiction 
+
+            ((member '(()()) final :test #'equal) (print "A contradicton has been found") 'NIL)
+
+;if the pl-resolution returns a list (NIL NIL) then we have encountered a contradiction
+
+            (t (setf lc (append final lc)) (resolution lc))
+
+;finally append the obatined result to the original list
+;so that new resolved clauses are added to the original clauses
+;and resolution function is to be called on the new set of clauses 
+
+       )
+       )
+) 
+ 
+
+
+(defun pl-resolution(clauses set-clauses)
+;This is the function for the prepositional resolution
+       (let ((flag 'T)(final '())(temp '()))
+;the flag variable helps in existing out of the control of the function
+;final variable is used to return the result of the function pl-resolution
+;temp variable takes all the resolvents 
+            (if (null (rest clauses)) nil)
+;if there no clauses left, flag the result to nil
+            (when flag
+;when flag is true
+                  (dolist (present (rest clauses) final)
+;iterate through the rest f the clauses in the list 
+;here the element is present 
+;list is (rest clauses)
+;value is the final variale
+                      (setf temp (resolve (first clauses) present))
+;temp variable is updated if a resolvent exists
+                      (if temp(if (not (member temp set-clauses :test #'equal))  (setf final (cons temp final)))) 
+;if temp is not a member of existing clauses then add it to the existing clauses                  
+                  )                       
+            )
+            (cond ((not flag) '())
+                  ((null final) (pl-resolution (rest clauses) set-clauses))
+;call the function pl-resolution on rest of the clauses  
+                  (t final)                                                                                            
+            )
+                                                                                                      
+        )                                                                                                  
+)
+
+
+
+(defun resolve(clause1 clause2)
+
+;This is the resolve function that resolves two clauses
+;it resolves left hand side of the first clause
+;with right hand side of the second clause
+;also resolves right hand side of the first clause 
+;with ;
+left hand side of the second clause        
+
+       (cond ((match (first clause1) (second clause2)) 
+
+;we can only resolve if there are common elements in these clauses
+;thus we call the match function on left hand side of first clause
+;right hand side of the second clause
+
+                     (list (append (remove temp (first clause1)) (first clause2)) 
+                           (append (second clause1) (remove temp (second clause2)))
+
+;if yes then we remove the common element found in both the 
+;left hand side of the first clause 
+;and right hand side of the second clause
+;and append these two to a list(the resolved element)
+;removes the common element and return the final list
+
+                     )
+             )
+                        
+             ((match (second clause1) (first clause2)) 
+
+;if there weren't any common elements in the first case
+;the above match function is invoked
+;it does the similar job like previous
+;here we match right hand side of the first clause 
+;to left hand side of the second clause
+
+                     (list (append (first clause1) (remove temp (first clause2))) 
+                           (append (remove temp (second clause1)) (second clause2))
+
+;we return the resolved element as a list
+                     )
+             )
+
+
+;if we can't match we return nil(empty resolvent)                       
+
+            (t nil)
+)
+)
+
+(defun match(element1 element2)
+ 
+
+;this function check if any elements of a list match the elements in the other                       
+      (cond ((null (first element1)) nil)
+
+;if the first element is nil, there is nothing to check
+;hence return nil                      
+
+            ((member (first element1) element2) (setf temp (first element1)))
+ 
+
+;if the first element of the first list
+;is present in the second list
+;take that element into a temporary variable used to remove element in the resolve function)
+;this can be used to remove this element in the resolve function                     
+            (t ( match (rest element1) element2))
+
+;if not match was found call the function on
+;the rest of the elements
+      )
+)
+
+
+
+(defun test-resolution()
+;This function is sample test function
+;can be used to check the correctness of the program
+       (print (resolution '( ((C D)(A)) ((A D E)()) (()(A C)) (()(D)) (()(E)) )) )
+       (print (resolution '( ((A)(B C)) ((B)()) (()(A)) ((C)()) )) )
+       (print (resolution '( ((A)(B C)) ((B)()) ((C)()) )) )
+       (print (resolution '( ((A)()) (()(A)) )))
+       (print (resolution '( (()()) (()()) )))
+)  
